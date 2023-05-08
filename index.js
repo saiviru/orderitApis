@@ -51,7 +51,7 @@ app.use('/api', router);
 app.use('/order',orderRouter);
 
 
-const port = process.env.PORT || 7700;
+const port = process.env.PORT || 6000;
 
 app.get('/', function (req, res) {
   res.send('Hellooooo');
