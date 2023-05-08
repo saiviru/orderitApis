@@ -1,7 +1,7 @@
 import express from 'express';
 const router = express.Router();
-import { Menu } from '../db/models/menu.js';
-import { User } from '../db/models/user.js';
+import { Menu } from '../models/menu.js';
+import { User } from '../models/user.js';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 import jsonwebtoken from 'jsonwebtoken';
 import cookieParser from 'cookie-parser';
