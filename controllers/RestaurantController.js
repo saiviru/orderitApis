@@ -12,7 +12,10 @@ const RestaurantController = async (req, res, next) => {
       await order.save();
   
       // Return the newly created order as the response
-      res.status(201).json(order);
+      res.status(201).send({
+				message: 'Order Created Successfully',
+				order,
+			});
     } catch (error) {
       next(error);
     }
