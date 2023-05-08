@@ -21,6 +21,10 @@ const RestaurantController = async (req, res, next) => {
           error,
         });
       });
-  };
+  }
 
+  catch(e){
+    next(e)
+  }
+}
   export {RestaurantController}
