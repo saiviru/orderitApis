@@ -3,7 +3,7 @@ import {RestaurantController} from '../controllers/RestaurantController.js';
 
 const orderRouter = express.Router();
 
-orderRouter.post('/', RestaurantController);
-orderRouter.get('/',RestaurantController)
+orderRouter.post('/orders', RestaurantController.postOrder);
+orderRouter.get('/orders',RestaurantController.getOrder)
 
 export {orderRouter}

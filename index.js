@@ -47,11 +47,10 @@ app.use(bodyParser.urlencoded({extended:false}));
 // }));
 
 
-app.use('/api', router);
-app.use('/order',orderRouter);
+app.use('/api', [router,orderRouter]);
 
 
-const port = process.env.PORT || 6000;
+const port = process.env.PORT || 7077;
 
 app.get('/', function (req, res) {
   res.send('Hellooooo');
