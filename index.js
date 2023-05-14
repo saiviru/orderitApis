@@ -5,7 +5,9 @@ import router from './routes/api.js';
 import {config} from 'dotenv';
 import cors from 'cors';
 import dbConnect from './db/dbConnect.js';
-import { orderRouter } from './routes/restaurant.js';
+import { orderRouter } from './routes/orders.js';
+import { restaurantRouter } from './routes/restaurant.js';
+
 
 config();
 dbConnect();
@@ -47,7 +49,7 @@ app.use(bodyParser.urlencoded({extended:false}));
 // }));
 
 
-app.use('/api', [router,orderRouter]);
+app.use('/api', [router,orderRouter,restaurantRouter]);
 
 
 const port = process.env.PORT || 7077;

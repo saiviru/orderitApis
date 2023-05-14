@@ -1,9 +1,11 @@
 import express from 'express';
 import {RestaurantController} from '../controllers/RestaurantController.js';
 
-const orderRouter = express.Router();
+const restaurantRouter = express.Router();
 
-orderRouter.post('/orders', RestaurantController.postOrder);
-orderRouter.get('/orders',RestaurantController.getOrder)
+restaurantRouter.post('/restaurant', RestaurantController.RestaurantDetails);
+restaurantRouter.put('/categoryUpdate',RestaurantController.UpdateRestaurantCategories)
+restaurantRouter.get('/resCategories/:id',RestaurantController.getCategories)
 
-export {orderRouter}
+
+export {restaurantRouter}

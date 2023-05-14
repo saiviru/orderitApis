@@ -1,7 +1,8 @@
+
 import mongoose from 'mongoose';
 const Schema = mongoose.Schema;
 
-const UserOrderSchema = new Schema({
+const RestaurantOrderSchema = new Schema({
     items: [
       {
         itemId: {
@@ -16,6 +17,10 @@ const UserOrderSchema = new Schema({
         price: {
           type: Number,
           required: true
+        },
+        name: {
+          type: String,
+          required: true
         }
       }
     ],
@@ -28,9 +33,14 @@ const UserOrderSchema = new Schema({
       enum: ['New', 'preparing', 'ready', 'delivered', 'cancelled'],
       default: 'New'
     },
+    restaurantId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Restaurant',
+      required: true
+    },
     userId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
+      ref: 'Users',
       required: true
     },
     createdAt: {
@@ -39,6 +49,6 @@ const UserOrderSchema = new Schema({
     }
   });
 
-export const UserModel = mongoose.model('userModel', UserOrderSchema);
+export const Order = mongoose.model('order', RestaurantOrderSchema);
 
   

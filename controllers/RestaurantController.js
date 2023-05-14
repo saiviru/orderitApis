@@ -1,24 +1,21 @@
-import { getRounds } from "bcrypt";
 import { Restaurant } from "../models/restaurant.js";
 import mongoose from "mongoose";
 
 const RestaurantController = {
-  async postOrder(req, res, next) {
+  async RestaurantDetails(req, res, next) {
     try {
-      const { userId, items, restaurantId, totalAmount } = req.body;
-      console.log(
-        "the items on post:",
-        userId,
-        items,
-        restaurantId,
-        totalAmount
-      );
+      // Generate server-side timestamp
+      const timestamp = new Date();
+
+      // Assign the timestamp to the appropriate field
+      req.body.createdAt = timestamp;
+      const { categories, restaurantId, status, createdAt } = req.body;
       // Create a new Order document
       const order = new Restaurant({
-        userId,
-        items,
+        status,
+        categories,
         restaurantId,
-        totalAmount,
+        createdAt,
       });
 
       // Save the new order document to the database
@@ -26,7 +23,7 @@ const RestaurantController = {
         .save()
         .then((result) => {
           res.status(201).send({
-            message: "Order Created Successfully",
+            message: "Restaurant Created Successfully",
             result,
           });
         })
@@ -40,16 +37,54 @@ const RestaurantController = {
       next(e);
     }
   },
-  async getOrder(req, res) {
+  async UpdateRestaurantCategories(req, res, next) {
     try {
-      const order = await Restaurant.find({});
-      if (!order) {
-        return res.status(404).json({ message: 'User not found' });
+      const { restaurantId, categories } = req.body;
+
+      // Find the restaurant by its ID
+      //   const resId = new mongoose.Types.ObjectId(restaurantId);
+      const restaurant = await Restaurant.findOne({ restaurantId });
+
+      if (!restaurant) {
+        return res.status(404).send({
+          message: "Restaurant not found",
+        });
       }
-      res.status(200).json(order);
+
+      // Update the categories
+      restaurant.categories = categories;
+
+      // Save the updated restaurant document
+      await restaurant.save();
+
+      res.status(200).send({
+        message: "Restaurant categories updated successfully",
+        result: restaurant,
+      });
     } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: 'Server error' });
+      res.status(500).send({
+        message: "Error updating restaurant categories",
+        error,
+      });
+    }
+  },
+  async getCategories(req, res) {
+    try {
+     const restaurantId = req.params.id;
+      const restaurant = await Restaurant.findOne({ restaurantId });
+      if (!restaurant) {
+        return res.status(404).send({
+          message: "Restaurant not found",
+        });
+      }
+      res.status(200).send({
+        data: restaurant.categories,
+      });
+    } catch (e) {
+      res.status(500).send({
+        message: "Error finding restaurant categories",
+        error,
+      });
     }
   },
 };

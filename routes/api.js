@@ -77,6 +77,7 @@ router.post('/authenticate',  (req, res)=> {
 							userId: user._id,
 							userEmail: user.email,
 							username:user.name,
+							rId: user.restaurantId
 						},
 						'RANDOM-TOKEN',
 						{ expiresIn: '1h' }
@@ -85,6 +86,9 @@ router.post('/authenticate',  (req, res)=> {
 					res.status(200).send({
 						message: 'Login Successful',
 						email: user.email,
+						rId: user.restaurantId,
+						username:user.name,
+						userId: user._id,
 						token,
 					});
 				}
