@@ -5,6 +5,10 @@ import router from './routes/api.js';
 import {config} from 'dotenv';
 import cors from 'cors';
 import dbConnect from './db/dbConnect.js';
+import { orderRouter } from './routes/orders.js';
+import { restaurantRouter } from './routes/restaurant.js';
+import {menuRouter} from './routes/menu.js';
+
 
 config();
 dbConnect();
@@ -46,11 +50,10 @@ app.use(bodyParser.urlencoded({extended:false}));
 // }));
 
 
-app.use('/api', router);
+app.use('/api', [router,orderRouter,restaurantRouter,menuRouter]);
 
 
-const port = process.env.PORT || 6000;
-
+const port = process.env.PORT || 7077;
 
 app.get('/', function (req, res) {
   res.send('Hellooooo');
