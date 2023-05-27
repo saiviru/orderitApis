@@ -49,5 +49,35 @@ const OrderController = {
       res.status(500).json({ message: 'Server error' });
     }
   },
+  async UpdateOrderStatus(req, res, next) {
+    try {
+      const { order, orderId } = req.body;
+
+      // Find the order by its ID
+      const actualOrder = await Order.findOne({ _id:orderId });
+
+      if (!actualOrder) {
+        return res.status(404).send({
+          message: "Order not found",
+        });
+      }
+
+      // Update the order
+      actualOrder.status = order.status;
+
+      // Save the updated restaurant document
+      await actualOrder.save();
+
+      res.status(200).send({
+        message: "Order Status updated successfully",
+        result: actualOrder,
+      });
+    } catch (error) {
+      res.status(500).send({
+        message: "Error updating order status",
+        error,
+      });
+    }
+  },
 };
 export { OrderController };
