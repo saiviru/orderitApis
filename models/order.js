@@ -30,7 +30,7 @@ const RestaurantOrderSchema = new Schema({
     },
     status: {
       type: String,
-      enum: ['New', 'In-Progress', 'ready', 'Completed', 'cancelled'],
+      enum: ['New', 'In-Progress', 'ready', 'Completed', 'Invalid'],
       default: 'New'
     },
     restaurantId: {
