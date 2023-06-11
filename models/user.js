@@ -16,7 +16,9 @@ const UserSchema = new mongoose.Schema({
   },
   name: { type: String, required: true },
   phone: { type: String, required: true },
-  restaurantId: { type: mongoose.Schema.Types.ObjectId, ref: "Restaurant" },
+  restaurantId: { type: mongoose.Schema.Types.ObjectId,
+    ref: "Restaurant",
+    default: mongoose.Types.ObjectId,},
 });
 
 UserSchema.pre("save", function (next) {
