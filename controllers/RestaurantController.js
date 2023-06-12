@@ -12,7 +12,7 @@ const RestaurantController = {
       // Assign the timestamp to the appropriate field
       req.body.createdAt = timestamp;
       const { categories, restaurantId, status, createdAt } = req.body;
-      // Create a new Order document
+      // Create a new Restaurant document
       const order = new Restaurant({
         status,
         categories,

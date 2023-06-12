@@ -39,7 +39,7 @@ var storage = multer.diskStorage({
 // POST route to register a user
 router.post('/register', async (req, res) => {
 	const { email, password, phone, name } = req.body;
-	console.log("the user details submitted:",req.body)
+	// console.log("the user details submitted:",req.body,email, password, phone, name)
 	const user = new User({ email, password, name, phone });
 	await user
 		.save()
@@ -82,7 +82,7 @@ router.post('/authenticate',  (req, res)=> {
 						'RANDOM-TOKEN',
 						{ expiresIn: '1h' }
 					);
-					console.log("the response from login",user );
+					console.log("the response from login",user )
 					res.status(200).send({
 						message: 'Login Successful',
 						email: user.email,
@@ -117,17 +117,10 @@ router.get('/secret', withAuth, function (req, res) {
 });
 
 // Get Menu items
-router.get('/menuGet/:id', async (req, res, next) => {
-	const restaurantId = req.params.id;
-      const menu = await Menu.findOne({ restaurantId });
-	  if (!menu) {
-        return res.status(404).send({
-          message: "Restaurant not found",
-        });
-      }
-      res.status(200).send({
-        data: menu,
-      });
+router.get('/menuGet', (req, res, next) => {
+	Menu.find({})
+		.then((data) => res.json(data))
+		.catch(next);
 });
 
 router.post('/uploadImages', multipleUpload, function (req, res) {

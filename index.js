@@ -8,6 +8,7 @@ import dbConnect from './db/dbConnect.js';
 import { orderRouter } from './routes/orders.js';
 import { restaurantRouter } from './routes/restaurant.js';
 import {menuRouter} from './routes/menu.js';
+import { menuDataRouter } from './routes/menuData.js';
 
 
 config();
@@ -50,7 +51,7 @@ app.use(bodyParser.urlencoded({extended:false}));
 // }));
 
 
-app.use('/api', [router,orderRouter,restaurantRouter,menuRouter]);
+app.use('/api', [router,orderRouter,restaurantRouter,menuRouter,menuDataRouter]);
 
 
 const port = process.env.PORT || 7077;

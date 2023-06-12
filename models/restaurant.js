@@ -13,7 +13,6 @@ const RestaurantSchema = new Schema({
   restaurantId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Restaurant",
-    default: mongoose.Types.ObjectId,
   },
   qrcodes: {
     type: Array,
