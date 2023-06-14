@@ -89,6 +89,41 @@ const RestaurantController = {
       });
     }
   },
+  async GetQRData(req, res) {
+    try {
+      const uniqueId = req.params.id;
+      const uniqueCodeData = await Restaurant.aggregate([
+        {
+          $match: { "qrcodes.uniqueId": uniqueId }
+        },
+        {
+          $project: {
+            qrcodes: {
+              $filter: {
+                input: "$qrcodes",
+                cond: { $eq: ["$$this.uniqueId", uniqueId] }
+              }
+            }
+          }
+        }
+      ]);
+      const uniqueIdData= uniqueCodeData[0].qrcodes[0]
+      console.log("the unique ID data:",uniqueCodeData[0].qrcodes[0], req.params.id);
+      if (!uniqueIdData) {
+        return res.status(404).send({
+          message: "Restaurant not found",
+        });
+      }
+      res.status(200).send({
+        data: uniqueIdData,
+      });
+    } catch (e) {
+      res.status(500).send({
+        message: "Error finding restaurant categories",
+        e,
+      });
+    }
+  },
   async GenerateQR(req, res, next) {
     try {
       // Generate server-side timestamp
@@ -97,7 +132,8 @@ const RestaurantController = {
       // Assign the timestamp to the appropriate field
       req.body.createdAt = timestamp;
       const { id, rid } = req.body;
-      const restaurant = await Restaurant.findOne({ rid });
+      const restaurant = await Restaurant.findOne({ restaurantId:rid });
+      console.log("the restaurant on qr generation api:",rid,id);
 
       if (!restaurant) {
         return res.status(404).send({
@@ -117,13 +153,14 @@ const RestaurantController = {
         uniqueId,
         maskedUrl,
         qrCodeImage,
+        rid,
         tableNumber:id
       };
       restaurant.qrcodes.push(qrData);
 
       await restaurant.save();
 
-      console.log("the restaurant qr codes:", restaurant);
+      // console.log("the restaurant qr codes:", restaurant);
 
       res.status(201).send({
         message: "Restaurant Table QR Created Successfully",

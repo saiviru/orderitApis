@@ -8,13 +8,14 @@ const OrderController = {
 
     // Assign the timestamp to the appropriate field
     req.body.createdAt = timestamp;
-      const { userId, items, restaurantId, totalAmount, createdAt } = req.body;
+      const { userId, items, restaurantId, totalAmount, table, createdAt } = req.body;
       // Create a new Order document
       const order = new Order({
         userId,
         items,
         restaurantId,
         totalAmount,
+        table,
         createdAt
       });
 

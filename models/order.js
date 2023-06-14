@@ -39,8 +39,12 @@ const RestaurantOrderSchema = new Schema({
       required: true
     },
     userId: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: String,
       ref: 'Users',
+      required: true
+    },
+    table:{
+      type: String,
       required: true
     },
     createdAt: {
