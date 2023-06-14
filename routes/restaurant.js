@@ -6,6 +6,7 @@ const restaurantRouter = express.Router();
 restaurantRouter.post('/restaurant', RestaurantController.RestaurantDetails);
 restaurantRouter.post('/qrcodes', RestaurantController.GenerateQR);
 restaurantRouter.get('/getQrData/:id', RestaurantController.GetQRData);
+restaurantRouter.get('/getAllQrData/:id', RestaurantController.GetAllQrData);
 restaurantRouter.put('/categoryUpdate',RestaurantController.UpdateRestaurantCategories)
 restaurantRouter.get('/resCategories/:id',RestaurantController.getCategories)
 

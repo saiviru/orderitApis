@@ -124,6 +124,24 @@ const RestaurantController = {
       });
     }
   },
+  async GetAllQrData(req,res,next){
+    try{
+      const restaurantId = req.params.id;
+      const restaurant = await Restaurant.findOne({ restaurantId });
+      console.log("the qr code data:",restaurant.qrcodes)
+      if (!restaurant) {
+        return res.status(404).send({
+          message: "Data not found",
+        });
+      }
+      res.status(200).send({
+        data: restaurant.qrcodes,
+      });
+    }
+    catch(e){
+
+    }
+  },
   async GenerateQR(req, res, next) {
     try {
       // Generate server-side timestamp
@@ -144,7 +162,7 @@ const RestaurantController = {
       const uniqueId = crypto.randomBytes(8).toString("hex");
 
       // Create the masked URL
-      const maskedUrl = `https://digitallicious.online/orderit/${uniqueId}`;
+      const maskedUrl = `https://thedigitallicious.online/orderit/${uniqueId}`;
 
       // Generate the QR code image
       const qrCodeImage = await QRCode.toDataURL(maskedUrl);
