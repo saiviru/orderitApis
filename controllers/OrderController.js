@@ -50,6 +50,20 @@ const OrderController = {
       res.status(500).json({ message: 'Server error' });
     }
   },
+  async getUserOrder(req, res) {
+    try {
+      const id = req.params.id;
+      const order = await Order.find({userId:id});
+      console.log("the user order items:",order)
+      if (!order) {
+        return res.status(404).json({ message: 'User orders not found' });
+      }
+      res.status(200).json(order);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Server error' });
+    }
+  },
   async UpdateOrderStatus(req, res, next) {
     try {
       const { order, orderId } = req.body;
