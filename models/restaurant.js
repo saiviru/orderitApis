@@ -18,6 +18,9 @@ const RestaurantSchema = new Schema({
     type: Array,
     default: [],
   },
+  menu: {
+    type: Array
+  },
   createdAt: {
     type: Date,
     default: Date.now(),

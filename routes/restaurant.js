@@ -4,6 +4,9 @@ import {RestaurantController} from '../controllers/RestaurantController.js';
 const restaurantRouter = express.Router();
 
 restaurantRouter.post('/restaurant', RestaurantController.RestaurantDetails);
+restaurantRouter.post('/createMenu',RestaurantController.MenuCreate);
+restaurantRouter.put('/editMenu', RestaurantController.MenuEdit);
+restaurantRouter.get('/getMenu/:id', RestaurantController.GetMenu);
 restaurantRouter.post('/qrcodes', RestaurantController.GenerateQR);
 restaurantRouter.get('/getQrData/:id', RestaurantController.GetQRData);
 restaurantRouter.get('/getAllQrData/:id', RestaurantController.GetAllQrData);

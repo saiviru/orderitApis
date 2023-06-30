@@ -39,6 +39,91 @@ const RestaurantController = {
       next(e);
     }
   },
+  async GetMenu(req,res) {
+    try {
+      const restaurantId = req.params.id;
+      const restaurant = await Restaurant.findOne({ restaurantId });
+      if (!restaurant) {
+        return res.status(404).send({
+          message: "Restaurant not found",
+        });
+      }
+      res.status(200).send({
+        data: restaurant.menu,
+      });
+    } catch (e) {
+      res.status(500).send({
+        message: "Error finding restaurant categories",
+        error,
+      });
+    }
+  },
+  async MenuCreate(req, res) {
+    //   console.log('the menu req', req.body);
+    try {
+      const { rId, menu } = req.body;
+      console.log("the menu for the restaurant is0:", req.body);
+      const restaurant = await Restaurant.findOne({ restaurantId: rId });
+      if (restaurant) {
+        try {
+          menu._id = new mongoose.Types.ObjectId();
+          menu.date = new Date();
+          restaurant.menu.push(menu);
+          await restaurant.save();
+          res.status(200).json(restaurant);
+        } catch (error) {
+          res.status(400).json({ message: error.message });
+        }
+      } else {
+        res.json({
+          error: 'The input field is empty dd',
+        });
+      }
+    }
+    catch (e) {
+      console.log("the error in creating menu:", e)
+    }
+  },
+  async MenuEdit(req, res, next) {
+    try {
+      const { rId, id, item } = req.body;
+      const restaurant = await Restaurant.findOne({ restaurantId: rId });
+
+      // console.log("the menu on put:",restaurant,{id}, {item})
+      if (!restaurant) {
+        return res.status(404).send({
+          message: "Restaurant not found",
+        });
+      }
+      else{
+        const menu = await restaurant.menu.findOne({_id: id});
+        console.log("the menu item to edit:", restaurant.menu);
+      }
+
+      // Update the menu item
+      // Update the menu item
+      // menu.itemName = item.itemName;
+      // menu.description = item.description;
+      // menu.price = item.price;
+      // menu.image = item.image;
+      // menu.category = item.category;
+      // menu.type = item.type;
+      // menu.date = item.date;
+
+      // // Save the updated menu document
+      // await menu.save();
+
+      // res.status(200).send({
+      //   message: "Menu Item updated successfully",
+      //   result: menu,
+      // });
+    } catch (error) {
+      res.status(500).send({
+        message: "Error updating menu item",
+        error,
+      });
+    }
+  },
   async UpdateRestaurantCategories(req, res, next) {
     try {
       const { restaurantId, categories } = req.body;
@@ -107,8 +192,8 @@ const RestaurantController = {
           }
         }
       ]);
-      const uniqueIdData= uniqueCodeData[0].qrcodes[0]
-      console.log("the unique ID data:",uniqueCodeData[0].qrcodes[0], req.params.id);
+      const uniqueIdData = uniqueCodeData[0].qrcodes[0]
+      console.log("the unique ID data:", uniqueCodeData[0].qrcodes[0], req.params.id);
       if (!uniqueIdData) {
         return res.status(404).send({
           message: "Restaurant not found",
@@ -124,11 +209,11 @@ const RestaurantController = {
       });
     }
   },
-  async GetAllQrData(req,res,next){
-    try{
+  async GetAllQrData(req, res, next) {
+    try {
       const restaurantId = req.params.id;
       const restaurant = await Restaurant.findOne({ restaurantId });
-      console.log("the qr code data:",restaurant.qrcodes)
+      console.log("the qr code data:", restaurant.qrcodes)
       if (!restaurant) {
         return res.status(404).send({
           message: "Data not found",
@@ -138,7 +223,7 @@ const RestaurantController = {
         data: restaurant.qrcodes,
       });
     }
-    catch(e){
+    catch (e) {
 
     }
   },
@@ -150,8 +235,8 @@ const RestaurantController = {
       // Assign the timestamp to the appropriate field
       req.body.createdAt = timestamp;
       const { id, rid } = req.body;
-      const restaurant = await Restaurant.findOne({ restaurantId:rid });
-      console.log("the restaurant on qr generation api:",rid,id);
+      const restaurant = await Restaurant.findOne({ restaurantId: rid });
+      console.log("the restaurant on qr generation api:", rid, id);
 
       if (!restaurant) {
         return res.status(404).send({
@@ -172,7 +257,7 @@ const RestaurantController = {
         maskedUrl,
         qrCodeImage,
         rid,
-        tableNumber:id
+        tableNumber: id
       };
       restaurant.qrcodes.push(qrData);
 
