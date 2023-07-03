@@ -166,7 +166,6 @@ const RestaurantController = {
       const restaurant = await Restaurant.findOne({ restaurantId: rId });
       
       if (restaurant) {
-        console.log("the restaurant here0:",restaurant,orderBody)
         try {
           orderBody._id = new mongoose.Types.ObjectId();
           restaurant.orders.push(orderBody);
@@ -189,7 +188,7 @@ const RestaurantController = {
     try {
       const restaurantId = req.params.id;
       const restaurant = await Restaurant.find({restaurantId});
-      console.log("the restaurant in orders get",restaurantId,restaurant)
+      console.log("the restaurant in orders get",restaurantId,restaurant);
       if (!restaurant) {
         return res.status(404).json({ message: 'Restaurant not found' });
       }
@@ -201,15 +200,51 @@ const RestaurantController = {
       res.status(500).json({ message: 'Server error' });
     }
   },
-  async getUserOrder(req, res) {
+  async GetUserOrder(req, res) {
     try {
-      const id = req.params.id;
-      const order = await Order.find({userId:id});
-      console.log("the user order items:",order)
-      if (!order) {
-        return res.status(404).json({ message: 'User orders not found' });
-      }
-      res.status(200).json(order);
+      const userId = req.params.id;
+      Restaurant.aggregate([
+        {
+          $match: {
+            'orders.userId': userId
+          }
+        },
+        {
+          $project: {
+            _id: 0,
+            orders: {
+              $filter: {
+                input: '$orders',
+                as: 'order',
+                cond: { $eq: ['$$order.userId', userId] }
+              }
+            }
+          }
+        },
+        {
+          $group: {
+            _id: null,
+            orders: { $push: '$orders' }
+          }
+        }
+      ])
+        .then(result => {
+          if (result.length > 0) {
+            const orders = result[0].orders.flat();
+            res.json(orders);
+          } else {
+            res.json([]);
+          }
+        })
+        .catch(error => {
+          res.status(500).json({ error: 'Internal Server Error' });
+        });
+      // const order = await Order.find({userId:id});
+      // console.log("the user order items:",order)
+      // if (!order) {
+      //   return res.status(404).json({ message: 'User orders not found' });
+      // }
+      // res.status(200).json(order);
     } catch (error) {
       console.error(error);
       res.status(500).json({ message: 'Server error' });
@@ -217,27 +252,43 @@ const RestaurantController = {
   },
   async UpdateOrderStatus(req, res, next) {
     try {
-      const { order, orderId } = req.body;
-
-      // Find the order by its ID
-      const actualOrder = await Order.findOne({ _id:orderId });
-
-      if (!actualOrder) {
-        return res.status(404).send({
-          message: "Order not found",
-        });
-      }
+      const { rId, order, orderId } = req.body;
+      Restaurant.findOne({ restaurantId: rId }, async (err, result) => {
+        if (err) {
+          console.error(err);
+          // Handle the error
+        } else {
+          const orderFetched = result.orders.find((orderItem) => orderItem._id.equals(orderId));
+          if (orderFetched) {
+            try {
+              orderFetched.status = order.status;
+              result.markModified('orders');
+              await result.save();
+              console.log('Order status updated successfully!');
+              res.status(200).send({
+                message: "Order Status updated successfully",
+                result: orderFetched,
+              });
+            } catch (err) {
+              console.error('Failed to update order status:', err);
+              // Handle the error
+            }
+          } else {
+            console.log('Order not found.');
+          }
+        }
+      });
 
       // Update the order
-      actualOrder.status = order.status;
+      // actualOrder.status = order.status;
 
-      // Save the updated restaurant document
-      await actualOrder.save();
+      // // Save the updated restaurant document
+      // await actualOrder.save();
 
-      res.status(200).send({
-        message: "Order Status updated successfully",
-        result: actualOrder,
-      });
+      // res.status(200).send({
+      //   message: "Order Status updated successfully",
+      //   result: actualOrder,
+      // });
     } catch (error) {
       res.status(500).send({
         message: "Error updating order status",
