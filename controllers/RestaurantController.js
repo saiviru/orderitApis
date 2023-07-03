@@ -54,7 +54,7 @@ const RestaurantController = {
     } catch (e) {
       res.status(500).send({
         message: "Error finding restaurant categories",
-        error,
+        e,
       });
     }
   },
@@ -84,42 +84,163 @@ const RestaurantController = {
       console.log("the error in creating menu:", e)
     }
   },
+  async MenuTotal(req, res) {
+    //   console.log('the menu req', req.body);
+    try {
+      const { rId, menu } = req.body;
+      console.log("the menu for the restaurant is0:", rId);
+      const restaurant = await Restaurant.findOne({ restaurantId: rId });
+      if (restaurant) {
+        try {
+          restaurant.menu=menu;
+          await restaurant.save();
+          res.status(200).json(restaurant);
+        } catch (error) {
+          res.status(400).json({ message: error.message });
+        }
+      } else {
+        res.json({
+          error: 'The input field is empty dd',
+        });
+      }
+    }
+    catch (e) {
+      console.log("the error in creating menu:", e)
+    }
+  },
   async MenuEdit(req, res, next) {
     try {
       const { rId, id, item } = req.body;
-      const restaurant = await Restaurant.findOne({ restaurantId: rId });
+      console.log("the details on edit:",rId, id);
+      // let menu;
+      Restaurant.findOne({ restaurantId: rId }, async (err, result) => {
+        if (err) {
+          console.error(err);
+          // Handle the error
+        } else {
+          const menu = result.menu.find((menuItem) => menuItem._id.equals(id));
+          if (menu) {
+            menu.itemName = item.itemName;
+            menu.description = item.description;
+            menu.price = item.price;
+            menu.image = item.image;
+            menu.category = item.category;
+            menu.type = item.type;
+            menu.date = item.date;
+            try {
+              console.log("the menu after editing",result)
+              result.markModified('menu');
+              await result.save();
+              console.log('Menu item updated successfully!');
+              res.status(200).send({
+                message: "Menu Item updated successfully",
+                result: menu,
+              });
+            } catch (err) {
+              console.error('Failed to update menu item:', err);
+              // Handle the error
+            }
+          } else {
+            console.log('Menu item not found.');
+          }
+        }
+      });
 
-      // console.log("the menu on put:",restaurant,{id}, {item})
-      if (!restaurant) {
-        return res.status(404).send({
-          message: "Restaurant not found",
-        });
-      }
-      else{
-        const menu = await restaurant.menu.findOne({_id: id});
-        console.log("the menu item to edit:", restaurant.menu);
-      }
-
-      // Update the menu item
-      // Update the menu item
-      // menu.itemName = item.itemName;
-      // menu.description = item.description;
-      // menu.price = item.price;
-      // menu.image = item.image;
-      // menu.category = item.category;
-      // menu.type = item.type;
-      // menu.date = item.date;
-
-      // // Save the updated menu document
-      // await menu.save();
-
-      // res.status(200).send({
-      //   message: "Menu Item updated successfully",
-      //   result: menu,
-      // });
+      
     } catch (error) {
       res.status(500).send({
         message: "Error updating menu item",
+        error,
+      });
+    }
+  },
+  async PostOrder(req, res, next) {
+    try {
+    const timestamp = new Date();
+
+    req.body.createdAt = timestamp;
+      const { userId, items, restaurantId, totalAmount, status, table, createdAt, rId } = req.body;
+      const orderBody = {
+        userId, items, restaurantId, status, totalAmount, table, createdAt
+      }
+      const restaurant = await Restaurant.findOne({ restaurantId: rId });
+      
+      if (restaurant) {
+        console.log("the restaurant here0:",restaurant,orderBody)
+        try {
+          orderBody._id = new mongoose.Types.ObjectId();
+          restaurant.orders.push(orderBody);
+          console.log("the restaurant here:",restaurant,orderBody)
+          await restaurant.save();
+          res.status(200).json(orderBody);
+        } catch (error) {
+          res.status(400).json({ message: error.message });
+        }
+      } else {
+        res.json({
+          error: 'The order could not be created',
+        });
+      }
+    } catch (e) {
+      next(e);
+    }
+  },
+  async GetOrder(req, res) {
+    try {
+      const restaurantId = req.params.id;
+      const restaurant = await Restaurant.find({restaurantId});
+      console.log("the restaurant in orders get",restaurantId,restaurant)
+      if (!restaurant) {
+        return res.status(404).json({ message: 'Restaurant not found' });
+      }
+      res.status(200).send({
+        data: restaurant[0].orders,
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Server error' });
+    }
+  },
+  async getUserOrder(req, res) {
+    try {
+      const id = req.params.id;
+      const order = await Order.find({userId:id});
+      console.log("the user order items:",order)
+      if (!order) {
+        return res.status(404).json({ message: 'User orders not found' });
+      }
+      res.status(200).json(order);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Server error' });
+    }
+  },
+  async UpdateOrderStatus(req, res, next) {
+    try {
+      const { order, orderId } = req.body;
+
+      // Find the order by its ID
+      const actualOrder = await Order.findOne({ _id:orderId });
+
+      if (!actualOrder) {
+        return res.status(404).send({
+          message: "Order not found",
+        });
+      }
+
+      // Update the order
+      actualOrder.status = order.status;
+
+      // Save the updated restaurant document
+      await actualOrder.save();
+
+      res.status(200).send({
+        message: "Order Status updated successfully",
+        result: actualOrder,
+      });
+    } catch (error) {
+      res.status(500).send({
+        message: "Error updating order status",
         error,
       });
     }
@@ -170,7 +291,7 @@ const RestaurantController = {
     } catch (e) {
       res.status(500).send({
         message: "Error finding restaurant categories",
-        error,
+        e,
       });
     }
   },
