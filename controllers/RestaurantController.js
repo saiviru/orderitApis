@@ -419,7 +419,7 @@ const RestaurantController = {
       const uniqueId = crypto.randomBytes(8).toString("hex");
 
       // Create the masked URL
-      const maskedUrl = `https://masla.in/orderit/${uniqueId}`;
+      const maskedUrl = `https://dorder.masla.in/orderit/${uniqueId}`;
 
       // Generate the QR code image
       const qrCodeImage = await QRCode.toDataURL(maskedUrl);
