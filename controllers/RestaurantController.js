@@ -1,4 +1,5 @@
 import { Restaurant } from "../models/restaurant.js";
+import { User } from "../models/user.js";
 import mongoose from "mongoose";
 import crypto from "crypto";
 import QRCode from "qrcode";
@@ -442,23 +443,26 @@ const RestaurantController = {
         result: qrData,
       });
 
-      // Save the new order document to the database
-      // await order
-      //   .save()
-      //   .then((result) => {
-      //     res.status(201).send({
-      //       message: "Restaurant Table QR Created Successfully",
-      //       result,
-      //     });
-      //   })
-      //   .catch((error) => {
-      //     res.status(500).send({
-      //       message: "Error creating the QR code",
-      //       error,
-      //     });
-      //   });
     } catch (e) {
       next(e);
+    }
+  },
+  async GetRestaurantName(req, res, next) {
+    try {
+      const restaurantId = req.params.id;
+      const user = await User.findOne({ restaurantId });
+      console.log("the qr code data:", user.name)
+      if (!user) {
+        return res.status(404).send({
+          message: "Data not found",
+        });
+      }
+      res.status(200).send({
+        data: user.name,
+      });
+    }
+    catch (e) {
+
     }
   },
 };

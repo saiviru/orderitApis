@@ -12,6 +12,7 @@ restaurantRouter.post('/postOrder',RestaurantController.PostOrder);
 restaurantRouter.put('/updateOrderStatus',RestaurantController.UpdateOrderStatus);
 restaurantRouter.get('/getOrder/:id',RestaurantController.GetOrder);
 restaurantRouter.get('/getUserOrder/:id',RestaurantController.GetUserOrder);
+restaurantRouter.get('/resName/:id',RestaurantController.GetRestaurantName);
 restaurantRouter.post('/qrcodes', RestaurantController.GenerateQR);
 restaurantRouter.get('/getQrData/:id', RestaurantController.GetQRData);
 restaurantRouter.get('/getAllQrData/:id', RestaurantController.GetAllQrData);
