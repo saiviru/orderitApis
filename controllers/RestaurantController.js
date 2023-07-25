@@ -62,7 +62,6 @@ const RestaurantController = {
     //   console.log('the menu req', req.body);
     try {
       const { rId, menu } = req.body;
-      console.log("the menu for the restaurant is0:", req.body);
       const restaurant = await Restaurant.findOne({ restaurantId: rId });
       if (restaurant) {
         try {
@@ -88,7 +87,6 @@ const RestaurantController = {
     //   console.log('the menu req', req.body);
     try {
       const { rId, menu } = req.body;
-      console.log("the menu for the restaurant is0:", rId);
       const restaurant = await Restaurant.findOne({ restaurantId: rId });
       if (restaurant) {
         try {
@@ -111,7 +109,6 @@ const RestaurantController = {
   async MenuEdit(req, res, next) {
     try {
       const { rId, id, item } = req.body;
-      console.log("the details on edit:",rId, id);
       // let menu;
       Restaurant.findOne({ restaurantId: rId }, async (err, result) => {
         if (err) {
@@ -128,10 +125,8 @@ const RestaurantController = {
             menu.type = item.type;
             menu.date = item.date;
             try {
-              console.log("the menu after editing",result)
               result.markModified('menu');
               await result.save();
-              console.log('Menu item updated successfully!');
               res.status(200).send({
                 message: "Menu Item updated successfully",
                 result: menu,
@@ -169,7 +164,6 @@ const RestaurantController = {
         try {
           orderBody._id = new mongoose.Types.ObjectId();
           restaurant.orders.push(orderBody);
-          console.log("the restaurant here:",restaurant,orderBody)
           await restaurant.save();
           res.status(200).json(orderBody);
         } catch (error) {
@@ -188,7 +182,6 @@ const RestaurantController = {
     try {
       const restaurantId = req.params.id;
       const restaurant = await Restaurant.find({restaurantId});
-      console.log("the restaurant in orders get",restaurantId,restaurant);
       if (!restaurant) {
         return res.status(404).json({ message: 'Restaurant not found' });
       }
@@ -264,7 +257,6 @@ const RestaurantController = {
               orderFetched.status = order.status;
               result.markModified('orders');
               await result.save();
-              console.log('Order status updated successfully!');
               res.status(200).send({
                 message: "Order Status updated successfully",
                 result: orderFetched,
@@ -365,7 +357,6 @@ const RestaurantController = {
         }
       ]);
       const uniqueIdData = uniqueCodeData[0].qrcodes[0]
-      console.log("the unique ID data:", uniqueCodeData[0].qrcodes[0], req.params.id);
       if (!uniqueIdData) {
         return res.status(404).send({
           message: "Restaurant not found",
@@ -385,7 +376,6 @@ const RestaurantController = {
     try {
       const restaurantId = req.params.id;
       const restaurant = await Restaurant.findOne({ restaurantId });
-      console.log("the qr code data:", restaurant.qrcodes)
       if (!restaurant) {
         return res.status(404).send({
           message: "Data not found",
@@ -408,7 +398,6 @@ const RestaurantController = {
       req.body.createdAt = timestamp;
       const { id, rid } = req.body;
       const restaurant = await Restaurant.findOne({ restaurantId: rid });
-      console.log("the restaurant on qr generation api:", rid, id);
 
       if (!restaurant) {
         return res.status(404).send({
@@ -461,5 +450,30 @@ const RestaurantController = {
       next(e);
     }
   },
+  async DeleteMenu(req, res, next) {
+    const data = req.params.id;
+    const separatedStrings = data.split(",");
+    let restaurantId = separatedStrings[1];
+    console.log("the restaurant id:", restaurantId);
+    try {
+      const restaurant = await Restaurant.findOne({ restaurantId });
+      if (!restaurant) {
+        // Handle the case when the restaurant is not found
+        return res.status(404).json({ message: "Restaurant not found" });
+      }
+  
+      const menu = restaurant.menu.filter(
+        (item) => item._id.toString() !== separatedStrings[0]
+      );
+      console.log("menu after delete:",menu)
+      restaurant.menu = menu;
+      await restaurant.save();
+      res.json(menu);
+    } catch (err) {
+      console.error(err);
+      // Handle other errors here
+      res.status(500).json({ message: "Server error" });
+    }
+  }
 };
 export { RestaurantController };

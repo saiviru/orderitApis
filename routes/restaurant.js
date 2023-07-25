@@ -16,7 +16,8 @@ restaurantRouter.post('/qrcodes', RestaurantController.GenerateQR);
 restaurantRouter.get('/getQrData/:id', RestaurantController.GetQRData);
 restaurantRouter.get('/getAllQrData/:id', RestaurantController.GetAllQrData);
 restaurantRouter.put('/categoryUpdate',RestaurantController.UpdateRestaurantCategories)
-restaurantRouter.get('/resCategories/:id',RestaurantController.getCategories)
+restaurantRouter.get('/resCategories/:id',RestaurantController.getCategories);
+restaurantRouter.delete('/deleteMenu/:id',RestaurantController.DeleteMenu);
 
 
 export {restaurantRouter}
